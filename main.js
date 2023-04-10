@@ -13,10 +13,6 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize( window.innerWidth, window.innerHeight );
 
-camera.position.setX(-62.127505436151495)
-camera.position.setY(37.706810552645706)
-camera.position.setZ(-26.0112337865994)
-
 // GEOMETRY
 
 // sphere
@@ -36,6 +32,17 @@ miniSphere.position.setY(0)
 scene.add( miniSphere );
 
 
+const geometry2 = new THREE.CapsuleGeometry( 1, 1, 4, 8 );
+const material2 = new THREE.MeshBasicMaterial( {color: 0xFFFFFF} );
+const ship = new THREE.Mesh( geometry2, material2 );
+
+ship.position.setZ(50)
+
+scene.add( ship );
+
+camera.position.setX(ship.position.x)
+camera.position.setY(ship.position.y)
+camera.position.setZ(ship.position.z + 20)
 
 const ambientLight = new THREE.AmbientLight(0xFFFFFF)
 scene.add(ambientLight)
@@ -71,13 +78,9 @@ function animate() {
   requestAnimationFrame(animate);
   sphere.rotation.x += 0.0001;
   sphere.rotation.y += 0.001;
+ 
 
-  console.log("-----------")
-  console.log(camera.position.x)
-  console.log(camera.position.y)
-  console.log(camera.position.z)
-
-  camera.position.x += 0.1
+  // camera.position.x += 0.1
   // camera.position.y += 0.1
   // camera.position.z += 0.1
 
@@ -97,7 +100,7 @@ function animate() {
   miniSphere.position.x = resolveMiniSphereOrbit(30, miniSphereZIndex, xLessThanZero)
   miniSphere.position.z = miniSphereZIndex;
 
-  orbitControls.update();
+  // orbitControls.update();
 
   renderer.render(scene, camera);
 }
@@ -123,4 +126,37 @@ function resolveMiniSphereOrbit(radius, z, isXLessThanZero) {
     return toReturn * -1;    
   }
   return isXLessThanZero ? Math.sqrt(result).toFixed(15) * -1 : Math.sqrt(result).toFixed(15); // The root square of result
+}
+
+
+
+document.addEventListener("keydown", (key) => controlShip(key))
+
+function controlShip(key) {
+
+  console.log(key)
+
+  if (key.code == 'ArrowUp') {
+    ship.position.z -= 2
+  }
+
+  if (key.code == 'ArrowDown') {
+    ship.position.z += 2;
+  }
+
+  if (key.code == 'ArrowLeft') {
+    ship.position.x -= 2;
+    // camera.rotation.y += 1
+  }
+
+  if (key.code == 'ArrowRight') {
+    ship.position.x += 2;
+  }
+ 
+
+  camera.position.setX(ship.position.x)
+  camera.position.setY(ship.position.y)
+  camera.position.setZ(ship.position.z + 20)
+
+
 }
