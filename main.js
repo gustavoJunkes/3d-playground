@@ -27,7 +27,7 @@ scene.add( sphere );
 
 geometry = new THREE.SphereGeometry( 2, 32, 16 );
 const miniSphere = new THREE.Mesh( geometry, material );
-miniSphere.position.setX(30)
+miniSphere.position.setX(100)
 miniSphere.position.setY(0)
 scene.add( miniSphere );
 
@@ -71,8 +71,7 @@ function addStars() {
 
 Array(1000).fill().forEach(() => addStars())
 
-var miniSphereZIndex = -29;
-var xLessThanZero = false;
+let miniSpherePositionAngle = 0;
 
 function animate() {
   requestAnimationFrame(animate);
@@ -84,51 +83,26 @@ function animate() {
   // camera.position.y += 0.1
   // camera.position.z += 0.1
 
-  if (miniSphere.position.x < 0) {
-    xLessThanZero = true;
-  }
-  
-  if (miniSphereZIndex <= -30) {
-    xLessThanZero = false;
-  }
-
-  if (xLessThanZero && miniSphere.position.z > -30) {
-    miniSphereZIndex -= 0.6;
-  } else {
-    miniSphereZIndex += 0.6;
-  }  
-  miniSphere.position.x = resolveMiniSphereOrbit(30, miniSphereZIndex, xLessThanZero)
-  miniSphere.position.z = miniSphereZIndex;
-
-  // orbitControls.update();
+  increaseMiniSpherePositionAngle();
+  calculateMiniSpherePosition(30, miniSpherePositionAngle);
 
   renderer.render(scene, camera);
 }
 
 animate()
 
-function resolveMiniSphereOrbit(radius, z, isXLessThanZero) {
-  // radius square minus z square = x square
-  const radiusSquare = Math.pow(radius, 2); 
-  const zSquare = Math.pow(z, 2);
-
-  var result = (radiusSquare - zSquare).toFixed(19);
-
-  if (z <= -30) {
-    xLessThanZero = false;
-  } 
-  
-  // transform to positive and to negative again
-  if (result < 0) {
-    result = Math.abs(result);
-    var toReturn = Math.sqrt(result);
-    
-    return toReturn * -1;    
-  }
-  return isXLessThanZero ? Math.sqrt(result).toFixed(15) * -1 : Math.sqrt(result).toFixed(15); // The root square of result
+function calculateMiniSpherePosition(radius, currentAngle) {
+  miniSphere.position.x = radius * Math.cos(currentAngle);
+  miniSphere.position.z = radius * Math.sin(currentAngle);
 }
 
-
+function increaseMiniSpherePositionAngle() {
+  if (miniSpherePositionAngle == 360) {
+    miniSpherePositionAngle = 0;
+  } else {
+    miniSpherePositionAngle = miniSpherePositionAngle + 0.02;
+  }
+}
 
 document.addEventListener("keydown", (key) => controlShip(key))
 
